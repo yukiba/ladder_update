@@ -152,3 +152,4 @@ production:
       options:
         user: <%= ENV["LADDER_MONGO_USER"] %>
         password: <%= ENV["LADDER_MONGO_PASSWORD"] %>
+        auth_source: admin
