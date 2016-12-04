@@ -26,7 +26,7 @@ describe 'appove and decline' do
   end
 
   it 'appove correct' do
-    
+
     u.score = 100
     g.appove
     expect(g.status).to eql(Grade::STATUS_APPROVED)
