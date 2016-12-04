@@ -141,3 +141,14 @@ test:
         read:
           mode: :primary
         max_pool_size: 1
+
+production:
+  clients:
+    default:
+      database: ladder_production
+      hosts:
+        - <%= ENV["LADDER_MONGO_HOSTS_1"] %>
+        - <%= ENV["LADDER_MONGO_HOSTS_2"] %>
+      options:
+        user: <%= ENV["LADDER_MONGO_USER"] %>
+        password: <%= ENV["LADDER_MONGO_PASSWORD"] %>
