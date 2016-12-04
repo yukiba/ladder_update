@@ -98,6 +98,7 @@ $ ->
     type: 'GET'
     error: (jqXHR, textStatus, errorThrown) ->
       chart.hideLoading()
+      $('#chart').height(0)
       $('body').append "请求天梯数据失败！"
     success: (data, textStatus, jqXHR) ->
       chart.hideLoading()
@@ -110,13 +111,7 @@ $ ->
 alterChartHeightByData = (dataLength) ->
   originalHeight = $('#chart').height()
   height = 2 * dataLength
-#  $('#chart').height("#{height}rem")
-
-
-#  $('#chart').height(2000)
   $('#chart').css('height', "#{height}rem");
   newHeight = $('#chart').height()
-
-  console.log(originalHeight, newHeight)
-#  $('#chart').height(originalHeight) if newHeight < originalHeight
+  $('#chart').height(originalHeight) if newHeight < originalHeight
   return
