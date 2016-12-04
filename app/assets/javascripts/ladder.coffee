@@ -2,42 +2,6 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
-# 测试数据
-data = [
-  {"name": "aaa", "score": 83},
-  {"name": "bbb", "score": 43},
-  {"name": "ccc", "score": 74},
-  {"name": "ddd", "score": 14},
-  {"name": "eee", "score": 98},
-  {"name": "fff", "score": 32},
-  {"name": "ggg", "score": 67},
-  {"name": "hhh", "score": 45},
-  {"name": "iii", "score": 39},
-  {"name": "jjj", "score": 52},
-  {"name": "kkk", "score": 59},
-  {"name": "lll", "score": 12},
-  {"name": "mmm", "score": 98},
-  {"name": "nnn", "score": 57},
-  {"name": "ooo", "score": 36},
-  {"name": "ppp", "score": 84},
-  {"name": "qqq", "score": 72},
-  {"name": "rrr", "score": 94},
-  {"name": "sss", "score": 53},
-  {"name": "ttt", "score": 62},
-  {"name": "uuu", "score": 38},
-  {"name": "vvv", "score": 67},
-  {"name": "www", "score": 18},
-  {"name": "xxx", "score": 66},
-  {"name": "yyy", "score": 77},
-  {"name": "zzz", "score": 30}
-]
-
-# 测试用button
-$ ->
-  $('#test').on 'click', ->
-    draw(pretreatData(data))
-    return
-
 # 根据score来排序
 sortByScore = (left, right) ->
   return 1 if left.score < right.score
@@ -78,9 +42,8 @@ pretreatData = (data) ->
   return colorByRank(data)
 
 # 绘制图形
-draw = (data) ->
+draw = (chart, data) ->
   data = data.reverse()
-  myChart = echarts.init(document.getElementById('main'));
   option = {
     title: {
       text: '天梯——实时量化绩效考核'
@@ -108,7 +71,7 @@ draw = (data) ->
         normal: {
           position: 'insideLeft',
           show: true,
-          formatter: '{b}: {c}',
+          formatter: '{b}: {c}分',
           textStyle: {
             color: '#000000'
           }
@@ -124,5 +87,36 @@ draw = (data) ->
       containLabel: true
     }
   }
-  myChart.setOption(option)
+  chart.setOption(option)
+  return
+
+# 页面载入完成后请求天梯数据
+$ ->
+  chart = echarts.init(document.getElementById('chart'))
+  chart.showLoading()
+  $.ajax '/ladder/scores',
+    type: 'GET'
+    error: (jqXHR, textStatus, errorThrown) ->
+      chart.hideLoading()
+      $('body').append "请求天梯数据失败！"
+    success: (data, textStatus, jqXHR) ->
+      chart.hideLoading()
+      data = pretreatData(data)
+      alterChartHeightByData(data.length)
+      chart = echarts.init(document.getElementById('chart'))
+      draw(chart, data)
+
+# 根据返回结果动态调整chart的高度
+alterChartHeightByData = (dataLength) ->
+  originalHeight = $('#chart').height()
+  height = 2 * dataLength
+#  $('#chart').height("#{height}rem")
+
+
+#  $('#chart').height(2000)
+  $('#chart').css('height', "#{height}rem");
+  newHeight = $('#chart').height()
+
+  console.log(originalHeight, newHeight)
+#  $('#chart').height(originalHeight) if newHeight < originalHeight
   return

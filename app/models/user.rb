@@ -62,5 +62,13 @@ class User
     def find_user_by_dingtalk_id(dingtalk_id)
       self.where(dingtalk_id: dingtalk_id).first
     end
+
+    # 查找所有用于显示在天梯展示页面的数据
+    # @return [Array[Hash{name:, score:}]]
+    def find_all_users_for_main_page()
+      User.where(valid_in_dingtalk: true, visible: true).map do |user|
+        {name: user.name, score: user.score}
+      end
+    end
   end
 end
