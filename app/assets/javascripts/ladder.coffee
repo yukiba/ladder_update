@@ -90,8 +90,8 @@ draw = (chart, data) ->
   chart.setOption(option)
   return
 
-# 页面载入完成后请求天梯数据
-$ ->
+# 请求天梯数据并绘制图形
+refreshChart = () ->
   chart = echarts.init(document.getElementById('chart'))
   chart.showLoading()
   $.ajax '/ladder/scores',
@@ -106,6 +106,12 @@ $ ->
       alterChartHeightByData(data.length)
       chart = echarts.init(document.getElementById('chart'))
       draw(chart, data)
+  return
+
+# 载入完成后立即请求天梯数据
+$ ->
+  refreshChart()
+  return
 
 # 根据返回结果动态调整chart的高度
 alterChartHeightByData = (dataLength) ->
@@ -114,4 +120,16 @@ alterChartHeightByData = (dataLength) ->
   $('#chart').css('height', "#{height}rem");
   newHeight = $('#chart').height()
   $('#chart').height(originalHeight) if newHeight < originalHeight
+  return
+
+# 显示右上角的刷新按钮
+$ ->
+  $(".refresh").fadeIn("fast")
+  return
+
+# 刷新事件
+$ ->
+  $(".refresh").click(->
+    refreshChart()
+  )
   return
