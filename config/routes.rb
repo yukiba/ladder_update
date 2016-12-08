@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   get '/admin/sync', to: 'admin#sync_dingtalk_users'
   # post '/admin/ticket', to: 'admin#query_jsapi_ticket'
+  post '/admin/jsapiconfig', to: 'admin#request_jsapi_config'
 
   get '/ladder/scores', to: 'ladder#realtime_score'
 

@@ -18,7 +18,7 @@ end
 #
 #   let(:server) { Dingtalk::Server.new(Dingtalk.corpid, Dingtalk.corpsecret) }
 #
-#   it 'can not query ticket without csrf' do
+#   it 'can not query ticket without csrf session' do
 #     post '/admin/ticket'
 #     expect(response.code).to eql('422')
 #   end
@@ -55,3 +55,19 @@ end
 #     expect(ticket_one).to eql(ticket_two)
 #   end
 # end
+
+describe 'jsapi_config', :type => :request do
+
+  let(:server) { Dingtalk::Server.new(Dingtalk.corpid, Dingtalk.corpsecret) }
+
+  it 'can not query jsapi config without csrf session' do
+    post '/admin/jsapiconfig'
+    expect(response.code).to eql('422')
+  end
+
+  it 'can query jsapi config bypass csrf' do
+    allow_any_instance_of(ActionController::Base).to receive(:protect_against_forgery?).and_return(false)
+    post '/admin/jsapiconfig', {url: 'http://xxx.yyy.zzz'}
+    expect(JSON.parse(response.body)['config']).not_to be nil
+  end
+end
