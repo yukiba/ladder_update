@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get '/ladder/scores', to: 'ladder#realtime_score'
 
   get '/user', to: 'user#index'
+  get '/user/:user_id', to: 'user#request_grade'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

@@ -1,8 +1,21 @@
 <script src="//g.alicdn.com/dingding/open-develop/0.8.4/dingtalk.js" type="text/javascript" charset="utf-8"></script>
-
+<%= javascript_include_tag params[:controller] + '/' + params[:action], 'data-turbolinks-track': 'reload' %>
 <%= javascript_include_tag 'jquery.base64.min', 'data-turbolinks-track': 'reload' %>
 <script type="text/javascript" charset="utf-8">
   var agentId = <%= ENV['LADDER_AGENT_ID'] %>
 </script>
 
-<button id="test">just a test</button>
+<div class="grid container-fluid">
+  <div class="cell cell-top col-xs-4" id="request-grade">
+    <%= image_tag 'jixiao.png', class: ['img-responsive'] %>
+    <label>绩效申请</label>
+  </div>
+  <div class="cell cell-top col-xs-4"></div>
+  <div class="cell cell-top cell-right col-xs-4"></div>
+  <!--<div class="cell col-xs-4"></div>-->
+  <!--<div class="cell col-xs-4"></div>-->
+  <!--<div class="cell cell-right col-xs-4"></div>-->
+  <!--<div class="cell col-xs-4"></div>-->
+  <!--<div class="cell col-xs-4"></div>-->
+  <!--<div class="cell cell-right col-xs-4"></div>-->
+</div>
