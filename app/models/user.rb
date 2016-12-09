@@ -9,7 +9,9 @@ class User
   field :visible, type: Boolean, default: true # 是否可见
   field :score, type: Integer, default: 0 # 量化考核评分
 
-  index({dingtalk_id: 1}, {unique: true})
+  index({dingtalk_id: 1}, {unique: true}) # 基于dingtalk_id的unique索引
+
+  ALL_USER_CACHE_KEY = 'User::ALL_USER_CACHE_KEY'
 
   # 构造
   def initialize(name, dingtalk_id)
@@ -18,18 +20,22 @@ class User
     self.dingtalk_id = dingtalk_id
   end
 
-  # 更改评分
-  # @param [Fixnum] grade 更改评分
-  def alter_score(grade)
-    self.score += grade
-    self.save
+  # 重载save，如果是新user就刷新缓存
+  # @return nothing
+  def save
+    new = new_record?
+    super
+    if new
+      self.class.find_all_users_with_cache(true)
+    end
   end
 
   class << self
 
     # 根据钉钉返回的结果更新所有user
-    # @param [Array[Dingtalk::UserInfo]] dingtalk_results 钉钉返回的user结果
-    def update_all(dingtalk_results)
+    # @param [Array[Dingtalk::UserInfo]] data 钉钉返回的user结果
+    def update_all(data)
+      dingtalk_results = data.dup
 
       # 根据是否存在于钉钉的结果，更新数据库里面的用户有效性
       self.all.each do |db_user|
@@ -56,18 +62,51 @@ class User
       end
     end
 
-    # 根据dingtalk_id查找用户
-    # @param [String] dingtalk_id
-    # @return [User] 查询结果或nil
-    def find_user_by_dingtalk_id(dingtalk_id)
-      self.where(dingtalk_id: dingtalk_id).first
-    end
-
     # 查找所有用于显示在天梯展示页面的数据
     # @return [Array[Hash{name:, score:}]]
-    def find_all_users_for_main_page()
-      User.where(valid_in_dingtalk: true, visible: true).map do |user|
+    def find_all_users_for_main_page
+      find_all_users_with_cache.select{|user| user.valid_in_dingtalk && user.visible}.map do |user|
         {name: user.name, score: user.score}
+      end
+    end
+
+    # 根据dingtalk_id查询用户
+    # @param [String] id dingtalk id
+    # @return [User] 未找到返回nil
+    def find_user_by_dingtalk_id(id)
+      users = find_all_users_with_cache
+      results = users.select do |user|
+        user.dingtalk_id == id
+      end
+      if results.empty?
+        users = find_all_users_with_cache(true)
+        results = users.select do |user|
+          user.dingtalk_id == id
+        end
+      end
+      return nil if results.empty?
+      results[0]
+    end
+  end
+
+  private
+
+  class << self
+
+    # 直接查找所有用户，不使用缓存
+    # @return [Array[User]] 不会返回nil
+    def find_all_users_directly
+      User.all.map do |user|
+        user
+      end
+    end
+
+    # 使用缓存查找所有用户
+    # @param [TrueClass/FalseClass] 默认false，如果需要强制刷新就传true
+    # @return [Array[User]] 不会返回nil
+    def find_all_users_with_cache(force = false)
+      Rails.cache.fetch(ALL_USER_CACHE_KEY, expires_in: 1.days, force: force) do
+        find_all_users_directly
       end
     end
   end
