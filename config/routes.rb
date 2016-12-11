@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   get '/user', to: 'user#index'
   get '/user/:user_id', to: 'user#request_grade'
+  post '/user/:user_id', to: 'user#add_grade'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
