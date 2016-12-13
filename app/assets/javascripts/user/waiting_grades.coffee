@@ -1,10 +1,5 @@
-# 修改导航栏右上角
-$ ->
-  startInitDingtalk(afterDingtalkInited)
-  return
-
-# 钉钉初始化成功后
-afterDingtalkInited = () ->
+# 会在钉钉初始化成功后被调用
+@afterDingtalkInitedInGradePage = () ->
   dd.biz.navigation.setRight({
     show: true,
     control: true,
@@ -16,6 +11,9 @@ afterDingtalkInited = () ->
       else
         window.location.reload
     )
+  })
+  dd.biz.navigation.setTitle({
+    title: '我的绩效申请'
   })
   return
 
@@ -45,7 +43,7 @@ displayData = (data) ->
       newDom = $('#data-sample').clone()
       newDom.css('display', 'block')
       newDom.children('div.data-left').children('label.data-title').html(d.title)
-      newDom.children('div.data-left').children('label.data-name').html(d.name + ' 创建于 ' + d.created_at)
+      newDom.children('div.data-left').children('label.data-name').html('创建于 ' + d.created_at)
       newDom.children('div.data-right').children('label.data-grade').html(d.grade + '分')
       newDom.children('div.data-right').children('label.data-status').html(d.status)
       newDom.children('label.data-grade-id').html(d.id)
@@ -55,5 +53,7 @@ displayData = (data) ->
 
 # 响应每个grade div点击事件
 onGradeDivClick = (target) ->
-#  console.log($(target.currentTarget).children('label.data-grade-id').text())
+  grade_id = $(target.currentTarget).children('label.data-grade-id').text()
+  grade_id = '0' unless grade_id?
+  window.location.href = '/user/' + grade_id + '/details'
   return

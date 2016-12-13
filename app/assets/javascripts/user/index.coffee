@@ -2,17 +2,6 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
-# 修改标题
-$ ->
-  dd.config()
-  dd.ready(() ->
-    dd.biz.navigation.setTitle({
-      title: '天梯'
-    })
-    dd.biz.navigation.setRight({show: false})
-  )
-  return
-
 # 响应绩效申请
 $ ->
   $('#request-grade').click(() ->
@@ -22,4 +11,11 @@ $ ->
     else
       window.location.reload
   )
+  return
+
+# 会在钉钉初始化成功之后被调用
+@afterDingtalkInitedInUserPage = () ->
+  dd.biz.navigation.setRight({
+    show: false
+  })
   return

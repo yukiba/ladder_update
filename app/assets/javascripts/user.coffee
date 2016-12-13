@@ -11,10 +11,12 @@ $ ->
 # 钉钉初始化结束之后
 afterDingtalkInited = () ->
   queryCurrentUserInfo()
+#  dd.ui.webViewBounce.disable() # 禁用下拉效果
+  afterDingtalkInitedInUserPage() if afterDingtalkInitedInUserPage?
   return
 
 # 开始钉钉的初始化
-@startInitDingtalk = (callback) ->
+startInitDingtalk = (callback) ->
   queryDingtalkConfig(
     (config) -> initDingtalk(config, callback),
     () -> dd.device.notification.alert({

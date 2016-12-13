@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   post '/user/:user_id/post', to: 'user#add_grade'
   get '/user/:user_id/grades/waiting', to: 'user#waiting_grades'
   post '/user/:user_id/grades/waiting/post', to: 'user#waiting_grades_data'
+  get '/user/:grade_id/details', to: 'user#grade_details'
+  post '/user/:grade_id/details/post', to: 'user#grade_details_data'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

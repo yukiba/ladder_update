@@ -1,10 +1,8 @@
-$ ->
-  dd.config()
-  dd.ready(() ->
-    dd.biz.navigation.setTitle({
-      title: '绩效申请'
-    })
-  )
+# 会在钉钉初始化成功后被调用
+@afterDingtalkInitedInGradePage = () ->
+  dd.biz.navigation.setTitle({
+    title: '绩效申请'
+  })
   return
 
 $ ->

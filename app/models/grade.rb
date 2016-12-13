@@ -52,6 +52,25 @@ class Grade
         }
       end
     end
+
+    # 根据grade的id查找grade信息
+    # @param [String] id _id
+    # @return [Hash]
+    def find_grade_details(id)
+      result = {}
+      grade = Grade.where(_id: id).first
+      unless grade.nil?
+        details = {}
+        details[:id] = grade._id.to_s
+        details[:title] = grade.title
+        details[:name] = User.username_to_s(grade.dingtalk_id)
+        details[:status] = grade.status
+        details[:description] = grade.description
+        details[:log] = grade.grade_logs.map { |log| log.to_s }
+        result[:details] = details
+      end
+      result
+    end
   end
 
   private

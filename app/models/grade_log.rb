@@ -37,6 +37,6 @@ class GradeLog
   # @return [String]
   def create_to_s
     username = User.username_to_s(creator_id)
-    "#{created_at.localtime.strftime('%F %R:%S')} #{username} 创建"
+    "#{Timeable::time_to_s(created_at)} #{username} 创建"
   end
 end

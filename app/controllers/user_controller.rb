@@ -39,4 +39,14 @@ class UserController < ApplicationController
   def waiting_grades
     render 'grades'
   end
+
+  def grade_details
+  end
+
+  # 查询指定grade的详细信息
+  def grade_details_data
+    grade_id = params[:grade_id]
+    details = Grade.find_grade_details(grade_id)
+    render json: details
+  end
 end

@@ -1,13 +1,4 @@
 $ ->
-  dd.config()
-  dd.ready(() ->
-    dd.biz.navigation.setTitle({
-      title: '绩效申请'
-    })
-  )
-  return
-
-$ ->
   if $('#new-request-button')
     $('#new-request-button').click (() ->
       currentUserId = Cookies.get(COOKIE_CURRENT_USER_ID)
@@ -16,4 +7,9 @@ $ ->
       else
         window.location.reload
     )
+  return
+
+# 会在钉钉初始化成功之后被调用
+@afterDingtalkInitedInUserPage = () ->
+  afterDingtalkInitedInGradePage() if afterDingtalkInitedInGradePage?
   return

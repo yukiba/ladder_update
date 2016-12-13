@@ -1,3 +1,7 @@
+body {
+  background-color: #F8F8F8;
+}
+
 .no-result {
   display: none;
   margin-left: auto;
@@ -30,11 +34,10 @@
 
 .results {
   display: none;
-  background: #F2F2F2;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  padding-left: 0;
+  padding-right: 0;
   border-top: 1px solid #DDDDDD;
-  padding: 0;
+  background-color: #ffffff;
 }
 
 .data {
