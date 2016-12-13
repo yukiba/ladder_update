@@ -4,12 +4,12 @@ class Grade
   include Mongoid::Timestamps
 
   field :dingtalk_id # 钉钉返回的id，唯一
-  field :title  # 任务标题
+  field :title # 任务标题
   field :grade, type: Float # 评分
   field :description # 描述
   field :status #状态
 
-  embeds_many :grade_logs
+  embeds_many :grade_logs, after_add: :sort_grade_logs_by_time # 操作日志
 
   # 各种状态
   STATUS_WAITING = '等待审批'
@@ -33,5 +33,32 @@ class Grade
 
     create_log = GradeLog.initialize_create(create_id)
     grade_logs << create_log
+  end
+
+  class << self
+
+    # 基于用户ID查找等待审批的grade
+    # @param [String] dingtalk_id
+    # @return [Array[Grade]] 未找到就返回一个空Array
+    def find_waiting_by_dingtalk_id(dingtalk_id)
+      Grade.where(dingtalk_id: dingtalk_id, status: STATUS_WAITING).order_by(created_at: :desc).map do |x|
+        {
+            id: x._id.to_s,
+            title: x.title,
+            grade: x.grade,
+            status: x.status,
+            name: User.username_to_s(x.dingtalk_id),
+            created_at: Timeable::time_to_s(x.created_at)
+        }
+      end
+    end
+  end
+
+  private
+
+  # 根据时间排序grade_logs
+  # @param [Array] logs 仅仅是为了满足回调函数的格式，实际不使用这个参数
+  def sort_grade_logs_by_time(logs)
+    self.grade_logs.sort! { |x, y| x.created_at <=> y.created_at }
   end
 end

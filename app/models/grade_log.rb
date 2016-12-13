@@ -36,22 +36,7 @@ class GradeLog
   # 创建动作对应的to_s
   # @return [String]
   def create_to_s
-    username = self.class.username_to_s(creator_id)
+    username = User.username_to_s(creator_id)
     "#{created_at.localtime.strftime('%F %R:%S')} #{username} 创建"
-  end
-
-  class << self
-    # 用户名
-    # @param [String] id dingtalk_id
-    # @return [String]
-    def username_to_s(id)
-      user = User.find_user_by_dingtalk_id(id)
-      if user.nil?
-        username = '未知用户'
-      else
-        username = user.name
-      end
-      username
-    end
   end
 end

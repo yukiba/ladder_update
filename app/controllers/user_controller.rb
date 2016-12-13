@@ -12,7 +12,7 @@ class UserController < ApplicationController
     name = params[:name] || ''
     grade = params[:grade].to_f
     description = params[:description] || ''
-    creator = params[:creator] || user_id
+    creator = cookies['current-user-id'] || ''
     result = {}
     if user_id.empty? || name.empty? || grade.zero? || description.empty? || creator.empty?
       result = {status: 'error', msg: '添加绩效请求失败！'}
@@ -27,5 +27,16 @@ class UserController < ApplicationController
       end
     end
     render json: result
+  end
+
+  # 查询指定用户正在等待批准的grades
+  def waiting_grades_data
+    user_id = params[:user_id] || ''
+    grades = Grade.find_waiting_by_dingtalk_id(user_id)
+    render json: grades
+  end
+
+  def waiting_grades
+    render 'grades'
   end
 end

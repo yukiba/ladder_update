@@ -4,15 +4,57 @@ require_relative '../config/environment'
 
 describe 'grade create log' do
 
+  User.delete_all
+  u = User.new('name', 'dingtalk_id')
+  u.save
+  Grade.delete_all
+  g = Grade.new('dingtalk_id', 'title', 10, 'description')
+  g.save
+
   it 'log correct' do
-    User.delete_all
-    u = User.new('name', 'dingtalk_id')
-    u.save
-    Grade.delete_all
-    g = Grade.new('dingtalk_id', 'title', 10, 'description')
-    g.save
     log = g.grade_logs[0].to_s
     expect(log).to match(/name/)
     expect(log).to match(/创建/)
+  end
+
+  it 'log asc' do
+    log = GradeLog.initialize_create('dingtalk_id')
+    log.created_at -= 5.days
+    g.grade_logs << log
+    g.save
+
+    log = GradeLog.initialize_create('dingtalk_id')
+    g.grade_logs << log
+    g.save
+
+    logs = g.grade_logs
+    expect(logs[0].created_at).to be <= logs[1].created_at
+    expect(logs[1].created_at).to be <= logs[2].created_at
+  end
+end
+
+describe 'find_waiting_by_dingtalk_id' do
+
+  it 'correct when grades found' do
+    Grade.delete_all
+
+    aaa = Grade.new('test_id', 'aaa', 10, 'aaa'); aaa.save
+    bbb = Grade.new('test_id', 'bbb', 10, 'bbb'); bbb.save; bbb.created_at -= 1.days
+    ccc = Grade.new('test_id', 'ccc', 10, 'ccc'); ccc.save; ccc.created_at += 1.days
+
+    ddd = Grade.new('test_id', 'ddd', 10, 'ddd'); ddd.status = Grade.const_get(:STATUS_B); ddd.save
+    aaa = Grade.new('test_id123', 'aaa', 10, 'aaa'); aaa.save
+
+    results = Grade.find_waiting_by_dingtalk_id('test_id')
+
+    expect(results.length).to eql 3
+    expect(results[0].created_at).to be >= results[1].created_at
+    expect(results[1].created_at).to be >= results[2].created_at
+  end
+
+  it 'correct when find nothing' do
+    Grade.delete_all
+    results = Grade.find_waiting_by_dingtalk_id('test_id')
+    expect(results.length).to eql 0
   end
 end

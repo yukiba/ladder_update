@@ -87,6 +87,19 @@ class User
       return nil if results.empty?
       results[0]
     end
+
+    # 根据dingtalk_id查询用户名
+    # @param [String] id dingtalk_id
+    # @return [String]
+    def username_to_s(id)
+      user = User.find_user_by_dingtalk_id(id)
+      if user.nil?
+        username = '未知用户'
+      else
+        username = user.name
+      end
+      username
+    end
   end
 
   private

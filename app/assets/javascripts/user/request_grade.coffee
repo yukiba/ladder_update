@@ -35,7 +35,7 @@ $ ->
       })
       return false
 
-    $.ajax window.location.pathname,
+    $.ajax window.location.pathname + '/post',
       type: 'POST'
       data: values
       error: (jqXHR, textStatus, errorThrown) ->
@@ -52,7 +52,9 @@ $ ->
         else if data.status == 'ok'
           dd.device.notification.toast({
             text: data.msg,
-            onSuccess: () -> history.back(-1)
+            onSuccess: (() ->
+              history.go(-1)
+            )
           })
         else
           dd.device.notification.toast({

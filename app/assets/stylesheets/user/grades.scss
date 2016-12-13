@@ -1,0 +1,95 @@
+.no-result {
+  display: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-result img {
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 120px;
+  height: 120px;
+}
+
+.no-result label {
+  margin-top: 10px;
+  font-size: 1.25rem;
+  display: block !important;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.no-result button {
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: none;
+}
+
+.results {
+  display: none;
+  background: #F2F2F2;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-top: 1px solid #DDDDDD;
+  padding: 0;
+}
+
+.data {
+  width: 100%;
+  height: 60px;
+  display: none;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.data label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis
+}
+
+.data-left {
+  width: 75%;
+  height: 100%;
+  float: left;
+}
+
+.data-title {
+  display: block;
+  font-size: 1.5rem;
+  padding-left: 25px;
+  padding-top: 10px;
+}
+
+.data-name {
+  display: block;
+  font-size: 1rem;
+  padding-left: 25px;
+}
+
+.data-right {
+  width: 25%;
+  height: 100%;
+  float: left;
+  text-align: right;
+}
+
+.data-grade {
+  display: block;
+  font-size: 1.25rem;
+  padding-right: 25px;
+  padding-top: 15px;
+  margin-bottom: 0;
+}
+
+.data-status {
+  display: block;
+  font-size: 1rem;
+  padding-right: 25px;
+}
+
+.data-grade-id {
+  display: none;
+}

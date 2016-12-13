@@ -5,15 +5,18 @@
 @COOKIE_CURRENT_USER_ID = 'current-user-id'
 
 $ ->
-  unless Cookies.get(COOKIE_CURRENT_USER_ID)
-    $('body').hide() # 隐藏body，等待钉钉那边信息获取结束之后再显示
-    startInitDingtalk()
+  $('body').hide() # 隐藏body，等待钉钉那边信息获取结束之后再显示
+  startInitDingtalk(afterDingtalkInited)
+
+# 钉钉初始化结束之后
+afterDingtalkInited = () ->
+  queryCurrentUserInfo()
   return
 
 # 开始钉钉的初始化
-@startInitDingtalk = () ->
+@startInitDingtalk = (callback) ->
   queryDingtalkConfig(
-    (config) -> initDingtalk(config),
+    (config) -> initDingtalk(config, callback),
     () -> dd.device.notification.alert({
       title: "访问天梯服务器失败",
       message: "点击确定返回上一页",
@@ -22,12 +25,12 @@ $ ->
   return
 
 # 初始化钉钉
-initDingtalk = (config) ->
+initDingtalk = (config, callback) ->
   config.agentId = agentId
   config.jsApiList = ['biz.user.get']
   dd.config(config)
   dd.ready(() ->
-    queryCurrentUserInfo()
+    callback() if callback
   )
   dd.error((err) ->
     dd.device.notification.alert({
@@ -54,10 +57,11 @@ queryCurrentUserInfo = () ->
     onSuccess: (info) ->
       Cookies.set(COOKIE_CURRENT_USER_ID, info.emplId, { path:'/', expires: 1 })
       $('body').show()
-    onFail: (err) -> dd.device.notification.alert({
-      title: "访问钉钉服务器失败",
-      message: "点击确定返回上一页",
-      onSuccess: () -> dd.biz.navigation.close()
+    onFail: (err) ->
+      dd.device.notification.alert({
+        title: "访问钉钉服务器失败",
+        message: "点击确定返回上一页",
+        onSuccess: () -> dd.biz.navigation.close()
     })
   })
   return
