@@ -1,6 +1,8 @@
 .grid {
   padding-left: 0 !important;
   padding-right: 0 !important;
+  border-top: 1px solid #F2F2F2;
+  margin-top: 15px;
 }
 
 .cell {
@@ -10,14 +12,6 @@
   text-align: center;
   padding-bottom: 5px;
   padding-top: 20px;
-}
-
-.cell-top {
-  border-top: 1px solid #F2F2F2;
-}
-
-.cell-right {
-  border-right: 0 !important;
 }
 
 .cell img {

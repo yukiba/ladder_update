@@ -58,3 +58,17 @@ describe 'find_waiting_by_dingtalk_id' do
     expect(results.length).to eql 0
   end
 end
+
+describe 'custom status setter' do
+
+  it 'correct' do
+
+    g = Grade.new('test_id', 'aaa', 10, 'aaa')
+    g.status = 'A++'
+    g.save
+    expect(g.status).to eql('A++')
+    g.status = 'B++'
+    g.save
+    expect(g.status).not_to eql('B++')
+  end
+end

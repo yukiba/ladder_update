@@ -1,14 +1,20 @@
 <div class="grid container-fluid">
-  <div class="cell cell-top col-xs-4" id="request-grade">
+  <div class="cell col-xs-4" id="request-grade">
     <%= image_tag 'jixiao.png', class: ['img-responsive'] %>
     <label>待审批</label>
   </div>
-  <div class="cell cell-top col-xs-4"></div>
-  <div class="cell cell-top cell-right col-xs-4"></div>
+  <div class="cell col-xs-4"></div>
+  <div class="cell col-xs-4"></div>
   <!--<div class="cell col-xs-4"></div>-->
   <!--<div class="cell col-xs-4"></div>-->
-  <!--<div class="cell cell-right col-xs-4"></div>-->
   <!--<div class="cell col-xs-4"></div>-->
   <!--<div class="cell col-xs-4"></div>-->
-  <!--<div class="cell cell-right col-xs-4"></div>-->
+  <!--<div class="cell col-xs-4"></div>-->
+  <!--<div class="cell col-xs-4"></div>-->
+  <% if @admin %>
+      <div class="cell col-xs-4" id="admin-all-waiting">
+        <%= image_tag 'waiting.png', class: ['img-responsive'] %>
+        <label>待我审批</label>
+      </div>
+  <% end %>
 </div>

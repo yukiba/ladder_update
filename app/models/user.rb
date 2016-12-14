@@ -9,15 +9,24 @@ class User
   field :visible, type: Boolean, default: true # 是否可见
   field :score, type: Integer, default: 0 # 量化考核评分
 
+  field :authority  # 权限
+  field :level  # 等级，保留着，以后再用
+
   index({dingtalk_id: 1}, {unique: true}) # 基于dingtalk_id的unique索引
 
   ALL_USER_CACHE_KEY = 'User::ALL_USER_CACHE_KEY'
 
+  AUTHORITY_NORMAL = '普通'
+  AUTHORITY_ADMIN = '管理员'
+
   # 构造
+  # @param [String] name
+  # @param [String] dingtalk_id
   def initialize(name, dingtalk_id)
     super()
     self.name = name
     self.dingtalk_id = dingtalk_id
+    self.authority = AUTHORITY_NORMAL
   end
 
   # 重载save，如果是新user就刷新缓存
@@ -28,6 +37,12 @@ class User
     if new
       self.class.find_all_users_with_cache(true)
     end
+  end
+
+  # 判断是否是管理员
+  # @return [TrueClass/FalseClass]
+  def admin?
+    authority == AUTHORITY_ADMIN
   end
 
   class << self
@@ -99,6 +114,14 @@ class User
         username = user.name
       end
       username
+    end
+
+    # 判断是否是管理员
+    # @param [String] dingtalk_id
+    def admin?(dingtalk_id)
+      user = User.find_user_by_dingtalk_id(dingtalk_id)
+      return true if !user.nil? && user.admin?
+      false
     end
   end
 

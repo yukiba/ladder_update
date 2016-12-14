@@ -13,7 +13,6 @@ class Grade
 
   # 各种状态
   STATUS_WAITING = '等待审批'
-  STATUS_CHECK = '复核中'
   STATUS_A_PLUS_PLUS = 'A++'
   STATUS_A_PLUS = 'A+'
   STATUS_A = 'A'
@@ -35,22 +34,28 @@ class Grade
     grade_logs << create_log
   end
 
+  # 自定义的status setter
+  # @param [String] value
+  def status=(value)
+    if value.in?(self.class.all_status)
+      self[:status] = value
+    end
+  end
+
   class << self
 
     # 基于用户ID查找等待审批的grade
     # @param [String] dingtalk_id
     # @return [Array[Grade]] 未找到就返回一个空Array
     def find_waiting_by_dingtalk_id(dingtalk_id)
-      Grade.where(dingtalk_id: dingtalk_id, status: STATUS_WAITING).order_by(created_at: :desc).map do |x|
-        {
-            id: x._id.to_s,
-            title: x.title,
-            grade: x.grade,
-            status: x.status,
-            name: User.username_to_s(x.dingtalk_id),
-            created_at: Timeable::time_to_s(x.created_at)
-        }
-      end
+      dingtalk_id ||= ''
+      find_waiting_grades(dingtalk_id)
+    end
+
+    # 查找所有等待审批的grade
+    # @return [Array[Grade]] 未找到就返回一个空Array
+    def find_all_waiting_grades
+      find_waiting_grades
     end
 
     # 根据grade的id查找grade信息
@@ -71,6 +76,32 @@ class Grade
       end
       result
     end
+
+    # 查询grade所有可能的状态
+    # @return [Array[String]]
+    def all_status
+      [STATUS_WAITING, STATUS_A_PLUS_PLUS, STATUS_A_PLUS, STATUS_A, STATUS_B,
+       STATUS_C, STATUS_D, STATUS_CANCELLED]
+    end
+
+    # 修改指定grade的状态
+    # @param [String] grade_id
+    # @param [String] user_id 修改者的id
+    # @param [String] status
+    # @return [TrueClass/FalseClass]
+    def update_status(grade_id, user_id, status)
+      grade = Grade.where(_id: grade_id).first
+      return false if grade.nil?
+      old_status = grade.status
+      grade.status = status
+      result = (grade.status == status)
+      if result
+        grade.save
+        log = GradeLog.initialize_update_status(user_id, old_status, status)
+        grade.grade_logs << log
+      end
+      result
+    end
   end
 
   private
@@ -79,5 +110,26 @@ class Grade
   # @param [Array] logs 仅仅是为了满足回调函数的格式，实际不使用这个参数
   def sort_grade_logs_by_time(logs)
     self.grade_logs.sort! { |x, y| x.created_at <=> y.created_at }
+  end
+
+  class << self
+
+    # 查找待审批的grades
+    # @param [String] dingtalk_id，不传，或传入nil就是查找全部用户的
+    # @return [Array[Grade]] 未找到就返回一个空Array
+    def find_waiting_grades(dingtalk_id = nil)
+      query = Grade.where(status: STATUS_WAITING)
+      query = query.where(dingtalk_id: dingtalk_id) unless dingtalk_id.nil?
+      query.order_by(created_at: :asc).map do |x|
+        {
+            id: x._id.to_s,
+            title: x.title,
+            grade: x.grade,
+            status: x.status,
+            name: User.username_to_s(x.dingtalk_id),
+            created_at: Timeable::time_to_s(x.created_at)
+        }
+      end
+    end
   end
 end

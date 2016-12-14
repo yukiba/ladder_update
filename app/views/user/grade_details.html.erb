@@ -6,7 +6,18 @@
   <div class="container results" id="results-div">
     <label id="details-title" class="details-title"></label>
     <label id="details-name" class="details-name"></label>
-    <div><label id="details-status" class="details-status"></label></div>
+    <% if !@admin %>
+    <label id="details-status" class="details-status"></label>
+    <% else %>
+    <div class="dropdown">
+      <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="dropdown-menu">
+        <li role="option"><a></a></li>
+      </ul>
+    </div>
+    <% end %>
+
     <label id="details-description" class="details-description"></label>
     <div id="logs"></div>
   </div>

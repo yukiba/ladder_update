@@ -1,6 +1,8 @@
 class UserController < ApplicationController
 
   def index
+    user_id = cookies['current-user-id'] || ''
+    @admin = User.admin?(user_id)
   end
 
   def request_grade
@@ -41,6 +43,8 @@ class UserController < ApplicationController
   end
 
   def grade_details
+    user_id = cookies['current-user-id'] || ''
+    @admin = User.admin?(user_id)
   end
 
   # 查询指定grade的详细信息
@@ -48,5 +52,37 @@ class UserController < ApplicationController
     grade_id = params[:grade_id]
     details = Grade.find_grade_details(grade_id)
     render json: details
+  end
+
+  def all_waiting_grades
+    render 'grades'
+  end
+
+  # 查询所有待审批的grades
+  def all_waiting_grades_data
+    user_id = cookies['current-user-id'] || ''
+    results = []
+    if User.admin?(user_id)
+      results = Grade.find_all_waiting_grades
+    end
+    render json: results
+  end
+
+  # 修改grade当前状态
+  def grade_status_update
+    grade_id = params[:grade_id] || ''
+    user_id = cookies['current-user-id'] || ''
+    status = params[:status] || ''
+    rtn = false
+    if User.admin?(user_id)
+      rtn = Grade.update_status(grade_id, user_id, status)
+    end
+    result = {}
+    if rtn
+      result[:status] = 'ok'
+    else
+      result[:status] = 'failed'
+    end
+    render json: result
   end
 end

@@ -33,7 +33,7 @@ $ ->
       })
       return false
 
-    $.ajax window.location.pathname + '/post',
+    $.ajax window.location.pathname + '/post?fresh=' + Math.random(),
       type: 'POST'
       data: values
       error: (jqXHR, textStatus, errorThrown) ->

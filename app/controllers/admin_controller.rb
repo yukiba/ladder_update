@@ -39,4 +39,9 @@ class AdminController < ApplicationController
     end
     render json: result
   end
+
+  # 返回grade所有可能的状态
+  def grade_all_status
+    render json: Grade.all_status
+  end
 end
