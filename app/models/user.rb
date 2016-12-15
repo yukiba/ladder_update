@@ -1,23 +1,29 @@
 class User
 
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :name # 姓名
   field :dingtalk_id # 钉钉返回的id，唯一
 
   field :valid_in_dingtalk, type: Boolean, default: true # 在钉钉中是否有效，存在-有效，不存在-无效
   field :visible, type: Boolean, default: true # 是否可见
-  field :score, type: Integer, default: 0 # 量化考核评分
+  field :score, type: Float, default: 0.0 # 当月量化考核评分
+  field :base_score, type: Float, default: 0.0 # 当月任务基本分
 
-  field :authority  # 权限
-  field :level  # 等级，保留着，以后再用
+  field :authority # 权限
+  field :level # 等级，保留着，以后再用
 
   index({dingtalk_id: 1}, {unique: true}) # 基于dingtalk_id的unique索引
+
+  embeds_many :score_records
 
   ALL_USER_CACHE_KEY = 'User::ALL_USER_CACHE_KEY'
 
   AUTHORITY_NORMAL = '普通'
   AUTHORITY_ADMIN = '管理员'
+
+  LAST_MONTH_RECORD_RATIO = 0.1 # 计算上个月绩效考核结果转移到本月的比例
 
   # 构造
   # @param [String] name
@@ -32,17 +38,26 @@ class User
   # 重载save，如果是新user就刷新缓存
   # @return nothing
   def save
-    new = new_record?
     super
-    if new
-      self.class.find_all_users_with_cache(true)
-    end
+
+    # 这里无论是是new，都需要刷新缓存，因为计算每个月绩效的时候，不是new，而此时需要强制刷新
+    self.class.find_all_users_with_cache(true)
   end
 
   # 判断是否是管理员
   # @return [TrueClass/FalseClass]
   def admin?
     authority == AUTHORITY_ADMIN
+  end
+
+  # 计算绩效记录
+  # @return [Nothing]
+  def calc_grade_record
+    now = Time.now.localtime
+    record = calc_monthly_grade_record(now.year, now.month)
+    self.score = record[:score]
+    self.base_score = record[:base_score]
+    self.save
   end
 
   class << self
@@ -80,8 +95,8 @@ class User
     # 查找所有用于显示在天梯展示页面的数据
     # @return [Array[Hash{name:, score:}]]
     def find_all_users_for_main_page
-      find_all_users_with_cache.select{|user| user.valid_in_dingtalk && user.visible}.map do |user|
-        {name: user.name, score: user.score}
+      find_all_users_with_cache.select { |user| user.valid_in_dingtalk && user.visible }.map do |user|
+        {name: user.name, score: user.score.round(2)}
       end
     end
 
@@ -126,6 +141,96 @@ class User
   end
 
   private
+
+  # 计算月度绩效考核结果
+  # @param [Fixnum] year
+  # @param [Fixnum] month
+  # @return [Float]
+  def calc_monthly_grade_record(year, month)
+    result = {score: 0.0, base_score: 0.0}
+    last_month_record = 0.0
+
+    # 比较待计算的月份与用户创建日期之间的大小
+    if Time.local(year, month) < Time.local(created_at.year, created_at.month)
+      # 待计算的月份较小，直接返回0.0
+      return result
+    else
+      # 待计算的月份较大，递归调用计算上个月的考核结果
+      last_month = Timeable::prev_month(year, month)
+      last_month_record = calc_monthly_grade_record(last_month[:year], last_month[:month])
+    end
+
+    last_month_record[:score] *= LAST_MONTH_RECORD_RATIO # 这里得到了上个月绩效考核结果中应当计入本月的分数
+
+    # 比较该用户在指定月份中最后一次修改单个grade的时间与grade record的更新时间大小
+    next_month = Timeable::next_month(year, month)
+    grade = Grade.find_last_update_grade(dingtalk_id, Time.local(year, month),
+                                         Time.local(next_month[:year], next_month[:month]))
+    if grade.nil?
+      result[:score] = last_month_record[:score]
+      return result
+    end
+
+    current_month_record = query_score_record(year, month)
+    prev_month = Timeable::prev_month(year, month)
+    prev_month_record = query_score_record(prev_month[:year], prev_month[:month])
+    if !current_month_record.nil? && !prev_month_record.nil? &&
+      current_month_record.updated_at > grade.updated_at &&
+          current_month_record.updated_at > prev_month_record.updated_at
+      # 无需更新的
+      result[:score] = current_month_record.score
+      result[:base_score] = current_month_record.base_score
+      return result
+    end
+
+    # 走到这里说明当月的得分需要重新计算
+    all_grades = Grade.find_all_grades_by_time(dingtalk_id, Time.local(year, month),
+                                               Time.local(next_month[:year], next_month[:month]))
+    ratio_score = last_month_record[:score]
+    current_base_score = 0.0
+    all_grades.each do |g|
+      if g.need_calc_grade?
+        ratio_score += g.ratio_grade
+        current_base_score += g.grade
+      end
+    end
+
+    update_score_record(year, month, ratio_score, current_base_score)
+
+    result[:score] = ratio_score
+    result[:base_score] = current_base_score
+    result
+  end
+
+  # 查询指定月份的score record
+  # @param [Fixnum] year
+  # @param [Fixnum] month
+  # @return [ScoreRecord] 未找到就返回nil
+  def query_score_record(year, month)
+    query = self.score_records.where(year: year, month: month)
+    if query.count > 1
+      # 走到这里说明已经发生了数据重复，全部删掉
+      query.delete
+    end
+    query.first
+  end
+
+  # 更新指定月份的score record，不存在就插入一条
+  # @param [Fixnum] year
+  # @param [Fixnum] month
+  # @param [Float] score
+  # @param [Float] base_score
+  def update_score_record(year, month, score, base_score)
+    record = query_score_record(year, month)
+    if record.nil?
+      record = ScoreRecord.new(year, month, score, base_score)
+      self.score_records << record
+    else
+      record.score = score
+      record.base_score = base_score
+    end
+    self.save
+  end
 
   class << self
 

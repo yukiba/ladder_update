@@ -72,3 +72,40 @@ describe 'custom status setter' do
     expect(g.status).not_to eql('B++')
   end
 end
+
+describe 'find_last_update_grade' do
+
+  it 'correct' do
+
+    Grade.delete_all
+
+    target = Grade.new('test_id', 'aaa', 10, 'aaa')
+    target.save
+
+    ccc = Grade.new('test_id', 'aaa', 10, 'aaa')
+    ccc.save
+
+    sleep(2)
+    target.grade = 11
+    target.save
+
+    ddd = Grade.new('test', 'aaa', 10, 'aaa')
+    ddd.save
+
+    aaa = Grade.new('test_id', 'aaa', 10, 'aaa')
+    aaa.save
+    aaa.created_at -= 1.months
+    aaa.save
+
+    bbb = Grade.new('test_id', 'aaa', 10, 'aaa')
+    bbb.save
+    bbb.created_at += 1.months
+    bbb.save
+
+    now = Time.now
+    next_month = Timeable::next_month(now.year, now.month)
+    result = Grade.find_last_update_grade('test_id', Time.local(now.year, now.month),
+                                          Time.local(next_month[:year], next_month[:month]))
+    expect(result._id).to eql(target._id)
+  end
+end

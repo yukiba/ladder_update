@@ -119,3 +119,118 @@ describe 'find user' do
     expect(t).to be nil
   end
 end
+
+describe 'query_score_record & update_score_record' do
+
+  it 'correct' do
+
+    User.delete_all
+
+    user = User.new("aaa", "1")
+    user.save
+
+    # insert
+    user.send(:update_score_record, 2016, 12, 100, 50)
+    record = user.send(:query_score_record, 2016, 12)
+    expect(record.score).to eql(100.0)
+    expect(record.base_score).to eql(50.0)
+
+    # update
+    user.send(:update_score_record,2016, 12, 200, 100)
+    record = user.send(:query_score_record, 2016, 12)
+    expect(record.score).to eql(200.0)
+    expect(record.base_score).to eql(100.0)
+  end
+end
+
+describe 'calc_grade_record' do
+
+  it 'current month' do
+
+    User.delete_all
+    Grade.delete_all
+
+    User.new("aaa", "1").save
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'A++')
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+
+    grade = Grade.new('2', '456', 10, '789')
+    grade.save
+    Grade.update_status(grade._id.to_s, '2', 'A++')
+
+    user = User.find_user_by_dingtalk_id('1')
+
+    expect(user.score).to eql(15.0)
+    expect(user.base_score).to eql(10.0)
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'C')
+
+    expect(user.score).to eql(20.0)
+    expect(user.base_score).to eql(20.0)
+  end
+
+  it 'last month' do
+
+    User.delete_all
+    Grade.delete_all
+
+    u = User.new("aaa", "1")
+    u.save
+    u.created_at = Time.now - 1.months
+    u.save
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'A++')
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    grade.created_at -= 1.months
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'A++')
+
+    user = User.find_user_by_dingtalk_id('1')
+
+    expect(user.score).to eql(16.5)
+    expect(user.base_score).to eql(10.0)
+  end
+
+  it 'last 2 months' do
+
+    User.delete_all
+    Grade.delete_all
+
+    u = User.new("aaa", "1")
+    u.save
+    u.created_at = Time.now - 2.months
+    u.save
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'A++')
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    grade.created_at -= 1.months
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'A+')
+
+    grade = Grade.new('1', '456', 10, '789')
+    grade.save
+    grade.created_at -= 2.months
+    grade.save
+    Grade.update_status(grade._id.to_s, '1', 'B')
+
+    user = User.find_user_by_dingtalk_id('1')
+
+    expect(user.score).to eql(16.325)
+    expect(user.base_score).to eql(10.0)
+  end
+end

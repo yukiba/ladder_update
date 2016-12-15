@@ -33,5 +33,42 @@ module Timeable
       # 默认情况
       time_s
     end
+
+    # 计算当月的时间区间
+    # @param [Fixnum] year
+    # @param [Fixnum] month
+    # @return [{left: , right: }]
+    def get_month_interval(year, month)
+      left = Time.local(year, month)
+      next_month = next_month(year, month)
+      right = Time.local(next_month[:year], next_month[:month])
+      {left: left, right: right}
+    end
+
+    # 计算下个月的时间信息
+    # @param [Fixnum] year
+    # @param [Fixnum] month
+    # @return [{year: , month: }]
+    def next_month(year, month)
+      month += 1
+      if month > 12
+        year += 1
+        month = 1
+      end
+      {year: year, month: month}
+    end
+
+    # 计算上个月的时间信息
+    # @param [Fixnum] year
+    # @param [Fixnum] month
+    # @return [{year: , month: }]
+    def prev_month(year, month)
+      month -= 1
+      if month < 1
+        year -= 1
+        month = 12
+      end
+      {year: year, month: month}
+    end
   end
 end

@@ -39,7 +39,20 @@ class Grade
   def status=(value)
     if value.in?(self.class.all_status)
       self[:status] = value
+      self.save
     end
+  end
+
+  # 是否需要进行计分
+  # @return [TrueClass/FalseClass]
+  def need_calc_grade?
+    status.in?([STATUS_A_PLUS_PLUS, STATUS_A_PLUS, STATUS_A, STATUS_B, STATUS_C, STATUS_D])
+  end
+
+  # 加上绩效后的分数
+  # @return [Float]
+  def ratio_grade
+    grade * ratio
   end
 
   class << self
@@ -99,8 +112,37 @@ class Grade
         grade.save
         log = GradeLog.initialize_update_status(user_id, old_status, status)
         grade.grade_logs << log
+
+        # 重新算分
+        user = User.find_user_by_dingtalk_id(user_id)
+        user.calc_grade_record unless user.nil?
       end
       result
+    end
+
+    # 在指定时间段内查找指定用户最后一个更新的grade
+    # @param [String] dingtalk_id 传nil就忽略这个参数
+    # @param [Time] from_time 开始时间（包含），传nil就忽略这个参数
+    # @param [Time] to_time 结束时间（不包含），传nil就忽略这个参数
+    def find_last_update_grade(dingtalk_id, from_time, to_time)
+      query = Grade.all
+      query = query.where(dingtalk_id: dingtalk_id) unless dingtalk_id.nil?
+      query = query.where(:created_at.gte => from_time) unless from_time.nil?
+      query = query.where(:created_at.lt => to_time) unless to_time.nil?
+      query = query.order_by(updated_at: :desc)
+      query.first
+    end
+
+    # 在指定时间段内查找指定用户的所有grade
+    # @param [String] dingtalk_id 传nil就忽略这个参数
+    # @param [Time] from_time 开始时间（包含），传nil就忽略这个参数
+    # @param [Time] to_time 结束时间（不包含），传nil就忽略这个参数
+    def find_all_grades_by_time(dingtalk_id, from_time, to_time)
+      query = Grade.all
+      query = query.where(dingtalk_id: dingtalk_id) unless dingtalk_id.nil?
+      query = query.where(:created_at.gte => from_time) unless from_time.nil?
+      query = query.where(:created_at.lt => to_time) unless to_time.nil?
+      query.all.map { |x| x }
     end
   end
 
@@ -110,6 +152,29 @@ class Grade
   # @param [Array] logs 仅仅是为了满足回调函数的格式，实际不使用这个参数
   def sort_grade_logs_by_time(logs)
     self.grade_logs.sort! { |x, y| x.created_at <=> y.created_at }
+  end
+
+  # 算分比率
+  # @return [Float]
+  def ratio
+    result = 0.0
+    case status
+      when STATUS_A_PLUS_PLUS
+        result = 1.5
+      when STATUS_A_PLUS
+        result = 1.25
+      when STATUS_A
+        result = 1.0
+      when STATUS_B
+        result = 0.75
+      when STATUS_C
+        result = 0.5
+      when STATUS_D
+        result = 0.0
+      else
+        result = 0.0
+    end
+    result
   end
 
   class << self
