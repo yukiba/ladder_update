@@ -145,7 +145,7 @@ test:
 production:
   clients:
     default:
-      database: ladder_production
+      database: <%= ENV["LADDER_MONGO_DATABASE"] %>
       hosts:
         - <%= ENV["LADDER_MONGO_HOSTS_1"] %>
         - <%= ENV["LADDER_MONGO_HOSTS_2"] %>
