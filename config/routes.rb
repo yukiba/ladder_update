@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   get '/ladder/scores', to: 'ladder#realtime_score'
 
-  get '/user', to: 'user#index'
+  get '/user', to: 'user#main'
   get '/user/:user_id', to: 'user#request_grade'
   post '/user/:user_id/post', to: 'user#add_grade'
   get '/user/:user_id/grades/waiting', to: 'user#waiting_grades'

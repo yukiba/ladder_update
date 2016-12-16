@@ -1,6 +1,6 @@
 class UserController < ApplicationController
 
-  def index
+  def main
     user_id = cookies['current-user-id'] || ''
     @admin = User.admin?(user_id)
   end
