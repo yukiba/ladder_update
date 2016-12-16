@@ -18,4 +18,5 @@ $ ->
       })
     success: (data, textStatus, jqXHR) ->
       onRequestGradesDataSuccess(data)
+      $('#new-request-button').css('display', 'none')
   return
