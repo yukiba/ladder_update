@@ -107,7 +107,7 @@ class Grade
       return false if grade.nil?
       old_status = grade.status
       grade.status = status
-      result = (grade.status == status)
+      result = (grade.status == status) # 这里的result不一定是恒为true，因为status=已经被重载，不是一定会修改成功的
       if result
         grade.save
         log = GradeLog.initialize_update_status(update_user_id, old_status, status)
