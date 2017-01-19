@@ -246,7 +246,7 @@ class User
     # @param [TrueClass/FalseClass] 默认false，如果需要强制刷新就传true
     # @return [Array[User]] 不会返回nil
     def find_all_users_with_cache(force = false)
-      Rails.cache.fetch(ALL_USER_CACHE_KEY, expires_in: 5.minutes, force: force) do
+      Rails.cache.fetch(ALL_USER_CACHE_KEY, expires_in: 1.days, force: force) do
         find_all_users_directly
       end
     end
