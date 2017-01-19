@@ -99,10 +99,10 @@ class Grade
 
     # 修改指定grade的状态
     # @param [String] grade_id
-    # @param [String] user_id 修改者的id
+    # @param [String] update_user_id 修改者的id
     # @param [String] status
     # @return [TrueClass/FalseClass]
-    def update_status(grade_id, user_id, status)
+    def update_status(grade_id, update_user_id, status)
       grade = Grade.where(_id: grade_id).first
       return false if grade.nil?
       old_status = grade.status
@@ -110,11 +110,11 @@ class Grade
       result = (grade.status == status)
       if result
         grade.save
-        log = GradeLog.initialize_update_status(user_id, old_status, status)
+        log = GradeLog.initialize_update_status(update_user_id, old_status, status)
         grade.grade_logs << log
 
         # 重新算分
-        user = User.find_user_by_dingtalk_id(user_id)
+        user = User.find_user_by_dingtalk_id(grade.dingtalk_id)
         user.calc_grade_record unless user.nil?
       end
       result
