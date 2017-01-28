@@ -55,7 +55,7 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # dingtalk
-gem 'dingtalk', github: 'sjtudoit/DingTalk'
+# gem 'dingtalk', github: 'sjtudoit/DingTalk'
 
 # maintenance
 gem 'turnout'
