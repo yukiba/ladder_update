@@ -42,9 +42,9 @@ initDingtalk = (config, callback) ->
     }))
   return
 
-# 向自己的服务器请求相关的钉钉配置信息
+# 向自己部署的签名服务器请求相关的钉钉配置信息
 queryDingtalkConfig = (successfulCallback, failedCallback) ->
-  $.ajax '/admin/jsapiconfig?fresh=' + Math.random(),
+  $.ajax 'http://dingtalk.sjtudoit.com/admin/jsapiconfig?fresh=' + Math.random(),
     type: 'POST'
     data: {url: $.base64.encode(window.location.href)}
     error: (jqXHR, textStatus, errorThrown) ->
