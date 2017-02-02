@@ -71,7 +71,7 @@ class User
       self.all.each do |db_user|
         find = false
         dingtalk_results.each_index do |index|
-          if db_user.dingtalk_id == dingtalk_results[index].userid
+          if db_user.dingtalk_id == dingtalk_results[index]['userid']
             db_user.valid_in_dingtalk = true
             db_user.save
             dingtalk_results.delete_at(index)
@@ -87,7 +87,7 @@ class User
 
       # 将新增的用户插入数据库
       dingtalk_results.each do |dingtalk_user|
-        user = User.new(dingtalk_user.name, dingtalk_user.userid)
+        user = User.new(dingtalk_user['name'], dingtalk_user['userid'])
         user.save
       end
     end

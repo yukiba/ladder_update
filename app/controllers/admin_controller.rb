@@ -1,11 +1,14 @@
 class AdminController < ApplicationController
 
+  # 接口url
+  INTERFACE_URL = 'http://dingtalk.sjtudoit.com'
+
   # 同步钉钉用户
   def sync_dingtalk_users
     head :ok
 
-    server = Dingtalk::Server.new(Dingtalk.corpid, Dingtalk.corpsecret)
-    all_users = server.query_all_users
+    uri = URI(INTERFACE_URL + '/admin/users')
+    all_users = JSON.parse(Net::HTTP.get(uri))
     User.update_all(all_users)
   end
 
