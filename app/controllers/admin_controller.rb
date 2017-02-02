@@ -3,15 +3,6 @@ class AdminController < ApplicationController
   # 接口url
   INTERFACE_URL = 'http://dingtalk.sjtudoit.com'
 
-  # 同步钉钉用户
-  def sync_dingtalk_users
-    head :ok
-
-    uri = URI(INTERFACE_URL + '/admin/users')
-    all_users = JSON.parse(Net::HTTP.get(uri))
-    User.update_all(all_users)
-  end
-
   # 获取jsapi_ticket用于加密
   # def query_jsapi_ticket
   #   server = Dingtalk::Server.new(Dingtalk.corpid, Dingtalk.corpsecret)
@@ -46,5 +37,22 @@ class AdminController < ApplicationController
   # 返回grade所有可能的状态
   def grade_all_status
     render json: Grade.all_status
+  end
+
+  class << self
+
+    # 同步钉钉用户
+    def sync_dingtalk_users
+      uri = URI(INTERFACE_URL + '/admin/users')
+      all_users = JSON.parse(Net::HTTP.get(uri))
+      User.update_all(all_users)
+    end
+
+    # 重新计算所有用户的分数
+    def calc_all_users_grade_record
+      User.find_all_users_directly.each do |user|
+        user.calc_grade_record
+      end
+    end
   end
 end
