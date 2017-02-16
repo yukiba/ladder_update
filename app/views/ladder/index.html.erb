@@ -1,9 +1,5 @@
-<% if 'production' == Rails.env %>
-    <script src="http://echarts.baidu.com/dist/echarts.min.js" type="text/javascript" charset="utf-8"></script>
-<% else %>
-    <script src="http://echarts.baidu.com/dist/echarts.js" type="text/javascript" charset="utf-8"></script>
-<% end %>
 <link rel="stylesheet" href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+<%= javascript_include_tag 'echarts.min', 'data-turbolinks-track': 'reload' %>
 
 <div id="chart"></div>
 <div class="refresh circle">
