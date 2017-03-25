@@ -2,6 +2,17 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
+# 响应新申请
+$ ->
+  $('#new-grade').click(() ->
+    currentUserId = Cookies.get(COOKIE_CURRENT_USER_ID)
+    if currentUserId
+      window.location.href = '/user/' + currentUserId
+    else
+      window.location.reload
+  )
+  return
+
 # 响应待审批
 $ ->
   $('#request-grade').click(() ->

@@ -1,10 +1,16 @@
 <div class="grid container-fluid">
+  <div class="cell col-xs-4" id="new-grade">
+    <%= image_tag 'new.png', class: ['img-responsive'] %>
+    <label>新申请</label>
+  </div>
   <div class="cell col-xs-4" id="request-grade">
     <%= image_tag 'jixiao.png', class: ['img-responsive'] %>
     <label>待审批</label>
   </div>
-  <div class="cell col-xs-4"></div>
-  <div class="cell col-xs-4"></div>
+  <div class="cell col-xs-4">
+    <%= image_tag 'proved.png', class: ['img-responsive'] %>
+    <label>已审批</label>
+  </div>
   <!--<div class="cell col-xs-4"></div>-->
   <!--<div class="cell col-xs-4"></div>-->
   <!--<div class="cell col-xs-4"></div>-->

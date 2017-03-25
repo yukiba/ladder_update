@@ -1,5 +1,8 @@
 # 会在钉钉初始化成功后被调用
-@afterDingtalkInitedInGradePage = () ->
+@afterDingtalkInitedInUserPage = () ->
+  dd.biz.navigation.setRight({
+    show: false
+  })
   dd.biz.navigation.setTitle({
     title: '绩效申请'
   })
