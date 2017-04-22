@@ -24,6 +24,17 @@ $ ->
   )
   return
 
+# 响应已审批
+$ ->
+  $('#proved-grade').click(() ->
+    currentUserId = Cookies.get(COOKIE_CURRENT_USER_ID)
+    if currentUserId
+      window.location.href = '/user/' + currentUserId + '/grades/proved'
+    else
+      window.location.reload
+  )
+  return
+
 # 响应待我审批
 $ ->
   if $('#admin-all-waiting')?

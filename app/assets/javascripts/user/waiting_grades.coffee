@@ -4,7 +4,7 @@
     show: false
   })
   dd.biz.navigation.setTitle({
-    title: '我的待审批'
+    title: '待审批'
   })
   return
 
@@ -17,7 +17,5 @@ $ ->
         text: "请求绩效数据失败！"
       })
     success: (data, textStatus, jqXHR) ->
-      console.log(data)
-
       onRequestGradesDataSuccess(data)
   return
