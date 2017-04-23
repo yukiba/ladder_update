@@ -15,7 +15,7 @@ $ ->
   return
 
 # 请求数据成功
-@onRequestGradesDataSuccess = (data) ->
+@onRequestGradesDataSuccess = (data, refresh = true) ->
   if data.length == 0
     $('#no-result-div').css('display', 'block')
     $('#new-request-button').css('display', 'block')
@@ -23,6 +23,7 @@ $ ->
   else
     $('#no-result-div').css('display', 'none')
     $('#results-div').css('display', 'block')
+    $('#results-div').empty() if refresh
     displayData(data)
   return
 
@@ -31,6 +32,7 @@ displayData = (data) ->
   for d in data
     do (d) ->
       newDom = $('#data-sample').clone()
+      newDom.attr('id', d.id);
       newDom.css('display', 'block')
       newDom.children('div.data-left').children('label.data-title').html(d.title)
       newDom.children('div.data-left').children('label.data-name').html(d.name + ' 创建于 ' + d.created_at)
@@ -39,6 +41,8 @@ displayData = (data) ->
       newDom.children('label.data-grade-id').html(d.id)
       newDom.click((target) -> onGradeDivClick(target))
       newDom.appendTo($('#results-div'))
+
+  scrollNewData(data) # 页面滚动到最新的数据
   return
 
 # 响应每个grade div点击事件
@@ -46,4 +50,32 @@ onGradeDivClick = (target) ->
   grade_id = $(target.currentTarget).children('label.data-grade-id').text()
   grade_id = '0' unless grade_id?
   window.location.href = '/user/' + grade_id + '/details'
+  return
+
+# 添加加载更多的标签
+@displayReloadMore = (onReloadMoreClick)->
+  newDom = $('<div class="reload-more"><label>点击加载更多</label></div>')
+  newDom.click((target) ->
+    onReloadMoreClick() if onReloadMoreClick?
+    $(target.currentTarget).remove()
+  )
+  newDom.appendTo($('#results-div'))
+  return
+
+# 添加没有更多的标签
+@displayNoMore = ()->
+  newDom = $('<div class="reload-more"><label>没有更多了</label></div>')
+  newDom.appendTo($('#results-div'))
+  offset = newDom.offset()
+  $("body,html").animate({
+    scrollTop: offset.top
+  }, 500)
+  return
+
+# 滚动到最新的数据
+scrollNewData = (newData)->
+  offset = $("#" + newData[0].id).offset()
+  $("body,html").animate({
+    scrollTop: offset.top
+  }, 500)
   return

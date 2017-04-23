@@ -39,6 +39,7 @@ class UserController < ApplicationController
   end
 
   def waiting_grades
+    @waiting = true
     render 'grades'
   end
 
@@ -55,6 +56,7 @@ class UserController < ApplicationController
   end
 
   def all_waiting_grades
+    @waiting = true
     render 'grades'
   end
 
@@ -84,5 +86,18 @@ class UserController < ApplicationController
       result[:status] = 'failed'
     end
     render json: result
+  end
+
+  # 查询指定用户已审批的grades
+  def proved_grades_data
+    user_id = cookies['current-user-id'] || ''
+    from_id = params[:from]   # 如果不存在这个字段，就把nil传到后面的函数中去
+    grades = Grade.find_proved_grades(user_id, from_id)
+    render json: grades
+  end
+
+  def proved_grades
+    @proved = true
+    render 'grades'
   end
 end

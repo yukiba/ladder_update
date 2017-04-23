@@ -4,10 +4,18 @@
 <div class="root">
   <div class="container no-result" id="no-result-div">
     <%= image_tag 'find.png', class: ['img-responsive', ''] %>
-    <label>没有待核准的申请</label>
-    <button id="new-request-button" class="btn btn-primary btn-sm">创建新申请</button>
+    <% if @waiting %>
+        <label>没有待核准的申请</label>
+        <button id="new-request-button" class="btn btn-primary btn-sm">创建新申请</button>
+    <% end %>
+    <% if @proved %>
+        <label>没有已审批的申请</label>
+    <% end %>
   </div>
   <div class="container results" id="results-div">
+    <div class="reload-more">
+      <label>点击加载更多</label>
+    </div>
   </div>
   <div class="data" id="data-sample">
     <div class="data-left">
