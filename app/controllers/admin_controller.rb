@@ -45,7 +45,7 @@ class AdminController < ApplicationController
 
     # 同步钉钉用户
     def sync_dingtalk_users
-      uri = URI('http://' + Rails.configuration.dingtalk_domain + '/admin/users')
+      uri = URI('https://' + Rails.configuration.dingtalk_domain + '/admin/users')
       all_users = JSON.parse(Net::HTTP.get(uri))
       User.update_all(all_users)
     end
