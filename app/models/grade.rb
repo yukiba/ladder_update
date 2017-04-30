@@ -93,8 +93,14 @@ class Grade
     # 查询grade所有可能的状态
     # @return [Array[String]]
     def all_status
-      [STATUS_WAITING, STATUS_A_PLUS_PLUS, STATUS_A_PLUS, STATUS_A, STATUS_B,
-       STATUS_C, STATUS_D, STATUS_CANCELLED]
+      [STATUS_WAITING,
+       # STATUS_A_PLUS_PLUS,
+       STATUS_A_PLUS,
+       STATUS_A,
+       STATUS_B,
+       STATUS_C,
+       # STATUS_D,
+       STATUS_CANCELLED]
     end
 
     # 修改指定grade的状态
@@ -166,9 +172,11 @@ class Grade
       when STATUS_A
         result = 1.0
       when STATUS_B
-        result = 0.75
-      when STATUS_C
+        # result = 0.75
         result = 0.5
+      when STATUS_C
+        # result = 0.5
+        result = 0.0
       when STATUS_D
         result = 0.0
       else
