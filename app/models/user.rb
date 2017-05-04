@@ -100,6 +100,14 @@ class User
       end
     end
 
+    # 查找所有有效用户
+    # @return [Array[Hash{name:, dingtalk_id:}]]
+    def find_all_valid_users
+      find_all_users_with_cache.select { |user| user.valid_in_dingtalk && user.visible }.map do |user|
+        {name: user.name, userid: user.dingtalk_id}
+      end
+    end
+
     # 根据dingtalk_id查询用户
     # @param [String] id dingtalk id
     # @return [User] 未找到返回nil
@@ -148,7 +156,6 @@ class User
   # @return [Float]
   def calc_monthly_grade_record(year, month)
     result = {score: 0.0, base_score: 0.0}
-    last_month_record = 0.0
 
     # 比较待计算的月份与用户创建日期之间的大小
     if Time.local(year, month) < Time.local(created_at.year, created_at.month)

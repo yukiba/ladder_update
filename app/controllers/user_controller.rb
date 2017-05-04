@@ -6,6 +6,19 @@ class UserController < ApplicationController
   end
 
   def request_grade
+    @grade_name = '任务名称'
+    @grade_number = '任务基本分'
+    @grade_description = '任务完成情况'
+  end
+
+  def punish
+    @grade_name = '名称'
+    @grade_number = '扣分'
+    @grade_description = '概要'
+    @grade_user = '扣分对象'
+
+    @punish = true
+    render 'request_grade'
   end
 
   # 接收post请求，添加一个grade
@@ -15,12 +28,14 @@ class UserController < ApplicationController
     grade = params[:grade].to_f
     description = params[:description] || ''
     creator = cookies['current-user-id'] || ''
+    punish_flag = params[:punish]
     result = {}
     if user_id.empty? || name.empty? || grade.zero? || description.empty? || creator.empty?
       result = {status: 'error', msg: '添加绩效请求失败！'}
     else
       save_result = false
       new_grade = Grade.new(user_id, name, grade, description, creator)
+      new_grade.convert_to_punish if 'true' == punish_flag
       save_result = new_grade.save rescue nil
       if save_result
         result = {status: 'ok', msg: "添加绩效请求成功！"}
@@ -99,5 +114,10 @@ class UserController < ApplicationController
   def proved_grades
     @proved = true
     render 'grades'
+  end
+
+  # 查询所有有效的用户
+  def find_all_valid_users
+    render json: User.find_all_valid_users
   end
 end
