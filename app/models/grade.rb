@@ -179,13 +179,10 @@ class Grade
 
   class << self
 
-    # 查找待审批的grades
-    # @param [String] dingtalk_id，不传，或传入nil就是查找全部用户的
-    # @return [Array[Grade]] 未找到就返回一个空Array
-    def find_waiting_grades(dingtalk_id = nil)
-      query = Grade.where(status: STATUS_WAITING)
-      query = query.where(dingtalk_id: dingtalk_id) unless dingtalk_id.nil?
-      query.order_by(created_at: :asc).map do |x|
+    # 复用grades的返回
+    # @return [Proc] 返回一个用于返回结果的Proc
+    def grade_results_proc()
+      Proc.new do |x|
         {
             id: x._id.to_s,
             title: x.title,
@@ -195,6 +192,28 @@ class Grade
             created_at: Timeable::time_to_s(x.created_at)
         }
       end
+    end
+
+    # 查找待审批的grades
+    # @param [String] dingtalk_id，不传，或传入nil就是查找全部用户的
+    # @return [Array 未找到就返回一个空Array
+    def find_waiting_grades(dingtalk_id = nil)
+      query = Grade.where(status: STATUS_WAITING)
+      query = query.where(dingtalk_id: dingtalk_id) unless dingtalk_id.nil?
+      query.order_by(created_at: :asc).map(&grade_results_proc)
+    end
+
+    # 查找已审批的grades
+    # @param [String] dingtalk_id，用户的dingtalk id
+    # @param [String] from_id，上一次查询的最后一个dingtalk id
+    # @param [Fixnum] limit，最多查询的个数
+    # @return [Array] 未找到就返回一个空Array
+    def find_proved_grades(dingtalk_id, from_id = nil, limit = 10)
+      query = Grade.where(:status.nin => [STATUS_WAITING])
+      query = query.where(dingtalk_id: dingtalk_id)
+      query = query.where(:_id.lt => from_id) if from_id
+      query = query.order_by(_id: :desc)
+      query.limit(limit).map(&grade_results_proc)
     end
   end
 end

@@ -18,6 +18,8 @@ Rails.application.routes.draw do
   get '/user/:grade_id/details', to: 'user#grade_details'
   post '/user/:grade_id/details/post', to: 'user#grade_details_data'
   post '/user/:grade_id/details/update/status', to: 'user#grade_status_update'
+  get '/user/:user_id/grades/proved', to: 'user#proved_grades'
+  post '/user/:user_id/grades/proved/post', to: 'user#proved_grades_data'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

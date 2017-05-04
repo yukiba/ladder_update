@@ -44,7 +44,8 @@ initDingtalk = (config, callback) ->
 
 # 向自己部署的签名服务器请求相关的钉钉配置信息
 queryDingtalkConfig = (successfulCallback, failedCallback) ->
-  $.ajax 'http://dingtalk.sjtudoit.com/admin/jsapiconfig?fresh=' + Math.random(),
+  url = '//' + '<%= Rails.configuration.dingtalk_domain %>' + '/admin/jsapiconfig?fresh=' + Math.random()
+  $.ajax url,
     type: 'POST'
     data: {url: $.base64.encode(window.location.href)}
     error: (jqXHR, textStatus, errorThrown) ->
