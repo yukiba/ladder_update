@@ -43,6 +43,14 @@ $ ->
     )
   return
 
+# 响应扣分
+$ ->
+  if $('#admin-punish')?
+    $('#admin-punish').click(() ->
+      window.location.href = '/admin/grades/punish'
+    )
+  return
+
 # 会在钉钉初始化成功之后被调用
 @afterDingtalkInitedInUserPage = () ->
   dd.biz.navigation.setRight({

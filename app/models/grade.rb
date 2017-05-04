@@ -20,6 +20,7 @@ class Grade
   STATUS_C = 'C'
   STATUS_D = 'D'
   STATUS_CANCELLED = '已废弃'
+  STATUS_PUNISH = '扣分'
 
   # 构造
   def initialize(dingtalk_id, title, grade, description, create_id = dingtalk_id)
@@ -46,13 +47,28 @@ class Grade
   # 是否需要进行计分
   # @return [TrueClass/FalseClass]
   def need_calc_grade?
-    status.in?([STATUS_A_PLUS_PLUS, STATUS_A_PLUS, STATUS_A, STATUS_B, STATUS_C, STATUS_D])
+    status.in?([STATUS_A_PLUS_PLUS, STATUS_A_PLUS, STATUS_A, STATUS_B, STATUS_C, STATUS_D, STATUS_PUNISH])
   end
 
   # 加上绩效后的分数
   # @return [Float]
   def ratio_grade
     grade * ratio
+  end
+
+  # 转换成惩罚
+  # @return [Nothing]
+  def convert_to_punish
+    self.status = STATUS_PUNISH
+
+    # 重新算分
+    user = User.find_user_by_dingtalk_id(self.dingtalk_id)
+
+    p 'start'
+    p user
+    user.calc_grade_record unless user.nil?
+
+    p 'close'
   end
 
   class << self
@@ -100,7 +116,8 @@ class Grade
        STATUS_B,
        STATUS_C,
        # STATUS_D,
-       STATUS_CANCELLED]
+       STATUS_CANCELLED,
+       STATUS_PUNISH]
     end
 
     # 修改指定grade的状态
@@ -179,6 +196,8 @@ class Grade
         result = 0.0
       when STATUS_D
         result = 0.0
+      when STATUS_PUNISH
+        result = -1.0
       else
         result = 0.0
     end
