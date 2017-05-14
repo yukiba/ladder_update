@@ -17,6 +17,7 @@ class User
   index({dingtalk_id: 1}, {unique: true}) # 基于dingtalk_id的unique索引
 
   embeds_many :score_records
+  has_and_belongs_to_many :groups
 
   ALL_USER_CACHE_KEY = 'User::ALL_USER_CACHE_KEY'
 
