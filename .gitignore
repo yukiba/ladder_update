@@ -22,3 +22,8 @@
 /Gemfile.lock
 /.idea
 /vendor/*
+
+/node_modules/*
+/public/packs/*
+/yarn.lock
+/yarn-error.log
