@@ -1,7 +1,9 @@
+require 'net/http'
+
 class AdminController < ApplicationController
 
   # 接口url
-  INTERFACE_URL = 'http://dingtalk.sjtudoit.com'
+  # INTERFACE_URL = 'http://dingtalk.sjtudoit.com'
 
   # 获取jsapi_ticket用于加密
   # def query_jsapi_ticket
@@ -43,7 +45,7 @@ class AdminController < ApplicationController
 
     # 同步钉钉用户
     def sync_dingtalk_users
-      uri = URI(INTERFACE_URL + '/admin/users')
+      uri = URI('https://' + Rails.configuration.dingtalk_domain + '/admin/users')
       all_users = JSON.parse(Net::HTTP.get(uri))
       User.update_all(all_users)
     end

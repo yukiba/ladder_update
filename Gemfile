@@ -61,3 +61,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'turnout'
 
 gem 'whenever', :require => false
+
+# react
+gem "react-rails"
+gem 'webpacker', github: 'rails/webpacker'
