@@ -22,3 +22,6 @@
 /Gemfile.lock
 /.idea
 /vendor/*
+
+/node_modules/*
+/public/packs/*
