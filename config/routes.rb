@@ -23,5 +23,7 @@ Rails.application.routes.draw do
   post '/user/:user_id/grades/proved/post', to: 'user#proved_grades_data'
   get '/all-valid-users', to: 'user#find_all_valid_users'
 
+  get '/react/hello', to: 'react#hello'
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
