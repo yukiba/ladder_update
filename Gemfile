@@ -63,3 +63,7 @@ gem 'turnout'
 gem 'whenever', :require => false
 
 gem 'redis-rails'
+
+# react
+gem "react-rails"
+gem 'webpacker', github: 'rails/webpacker'
