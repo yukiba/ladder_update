@@ -27,3 +27,4 @@
 /public/packs/*
 /yarn.lock
 /yarn-error.log
+/bin/webpack-dev-server-with-params.sh
