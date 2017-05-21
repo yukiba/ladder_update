@@ -25,7 +25,7 @@ module.exports = {
   ),
 
   output: {
-    filename: '[name].js',
+    filename: '[name].[chunkhash:8].js',
     path: resolve(paths.output, paths.entry),
     publicPath
   },
