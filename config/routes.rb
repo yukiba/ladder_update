@@ -21,6 +21,10 @@ Rails.application.routes.draw do
   post '/user/:grade_id/details/update/status', to: 'user#grade_status_update'
   get '/user/:user_id/grades/proved', to: 'user#proved_grades'
   post '/user/:user_id/grades/proved/post', to: 'user#proved_grades_data'
+
+  get '/group/graduates', to: 'user#graduates'
+  get '/group/graduates/scores', to: 'user#graduates_scores'
+
   get '/all-valid-users', to: 'user#find_all_valid_users'
 
   get '/react/hello', to: 'react#hello'

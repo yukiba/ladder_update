@@ -35,6 +35,13 @@ $ ->
   )
   return
 
+# 响应交大研究生数据
+$ ->
+  $('#graduates').click(() ->
+    window.location.href = '/group/graduates'
+  )
+  return
+
 # 响应待我审批
 $ ->
   if $('#admin-all-waiting')?
