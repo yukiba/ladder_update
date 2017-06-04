@@ -120,4 +120,13 @@ class UserController < ApplicationController
   def find_all_valid_users
     render json: User.find_all_valid_users
   end
+
+  def graduates
+  end
+
+  # 查询所有交大研究生的分数
+  def graduates_scores
+    scores = Group.find_sjtu_core_graduates_info
+    render json: scores
+  end
 end
