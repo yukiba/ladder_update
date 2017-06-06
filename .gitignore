@@ -29,3 +29,6 @@
 /yarn-error.log
 /webpack-dev-server-with-params.sh
 /app/javascript/.idea
+/public/packs
+/node_modules
+/public/assets

@@ -66,4 +66,4 @@ gem 'redis-rails'
 
 # react
 gem "react-rails"
-gem 'webpacker', github: 'rails/webpacker'
+gem 'webpacker', '~> 1.2'
