@@ -4,7 +4,7 @@
 
 # 响应新申请
 $ ->
-  $('#new-grade').click(() ->
+  $(document).on("click", '#new-grade', () ->
     currentUserId = Cookies.get(COOKIE_CURRENT_USER_ID)
     if currentUserId
       window.location.href = '/user/' + currentUserId
@@ -15,7 +15,7 @@ $ ->
 
 # 响应待审批
 $ ->
-  $('#request-grade').click(() ->
+  $(document).on("click", '#request-grade', () ->
     currentUserId = Cookies.get(COOKIE_CURRENT_USER_ID)
     if currentUserId
       window.location.href = '/user/' + currentUserId + '/grades/waiting'
@@ -26,7 +26,7 @@ $ ->
 
 # 响应已审批
 $ ->
-  $('#proved-grade').click(() ->
+  $(document).on("click", '#proved-grade', () ->
     currentUserId = Cookies.get(COOKIE_CURRENT_USER_ID)
     if currentUserId
       window.location.href = '/user/' + currentUserId + '/grades/proved'
@@ -35,12 +35,25 @@ $ ->
   )
   return
 
+# 响应交大研究生数据
+$ ->
+  $(document).on("click", '#graduates', () ->
+    window.location.href = '/group/graduates'
+  )
+  return
+
 # 响应待我审批
 $ ->
-  if $('#admin-all-waiting')?
-    $('#admin-all-waiting').click(() ->
-      window.location.href = '/admin/grades/waiting'
-    )
+  $(document).on("click", '#admin-all-waiting', () ->
+    window.location.href = '/admin/grades/waiting'
+  )
+  return
+
+# 响应扣分
+$ ->
+  $(document).on("click", '#admin-punish', () ->
+    window.location.href = '/admin/grades/punish'
+  )
   return
 
 # 会在钉钉初始化成功之后被调用
