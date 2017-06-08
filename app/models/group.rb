@@ -43,7 +43,7 @@ class Group
     def insert_user(group_name, user)
       group = Group.where(:name => group_name).first
       group.users << user unless group.nil?
-      find_group_users_with_cache(group_name, true) # 强制刷新
+      force_update_caches(group_name)
     end
 
     # 直接查找组内所有用户，不使用缓存
@@ -67,5 +67,17 @@ class Group
         find_group_users_directly(group_name)
       end
     end
+
+    # 强制更新信息缓存
+    # @param [String] group_name 小组名称
+    # @return nothing
+    def force_update_caches(group_name)
+      find_group_users_with_cache(group_name, true)
+    end
+  end
+
+  # 订阅用户数据更新事件
+  ActiveSupport::Notifications.subscribe(User::USER_INFO_UPDATED) do
+    force_update_caches(SJTU_CORE_GRADUATE)
   end
 end
