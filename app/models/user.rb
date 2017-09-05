@@ -26,6 +26,8 @@ class User
 
   LAST_MONTH_RECORD_RATIO = 0.1 # 计算上个月绩效考核结果转移到本月的比例
 
+  USER_INFO_UPDATED = 'User::USER_INFO_UPDATED' # 用于用于信息更新的订阅
+
   # 构造
   # @param [String] name
   # @param [String] dingtalk_id
@@ -36,13 +38,13 @@ class User
     self.authority = AUTHORITY_NORMAL
   end
 
-  # 重载save，如果是新user就刷新缓存
+  # 重载save，发布user信息变更的消息
   # @return nothing
   def save
     super
 
-    # 这里无论是是new，都需要刷新缓存，因为计算每个月绩效的时候，不是new，而此时需要强制刷新
-    self.class.find_all_users_with_cache(true)
+    # 发布一个user信息变更的消息
+    ActiveSupport::Notifications.instrument(USER_INFO_UPDATED)
   end
 
   # 判断是否是管理员
@@ -259,5 +261,16 @@ class User
         find_all_users_directly
       end
     end
+
+    # 强制更新所有用户信息
+    # @return nothing
+    def force_update_users_info
+      find_all_users_with_cache(true)
+    end
+  end
+
+  # 订阅用户数据更新事件
+  ActiveSupport::Notifications.subscribe(USER_INFO_UPDATED) do
+    force_update_users_info
   end
 end
