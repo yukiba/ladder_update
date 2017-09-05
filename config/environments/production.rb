@@ -51,10 +51,10 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   config.cache_store = :redis_store, {
-      host: ENV['SJTUDOIT_REDIS_HOST'],
+      host: ENV['LADDER_REDIS_HOST'],
       port: 6379,
-      db: ENV['SJTUDOIT_REDIS_DB'],
-      password: ENV['SJTUDOIT_REDIS_PWD'],
+      db: ENV['LADDER_REDIS_DB'],
+      password: ENV['LADDER_REDIS_PWD'],
       namespace: 'Dingladder'
   }
 
