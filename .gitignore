@@ -24,7 +24,6 @@
 
 /node_modules/*
 /public/packs/*
-/yarn.lock
 /yarn-error.log
 /webpack-dev-server-with-params.sh
 /app/javascript/.idea
